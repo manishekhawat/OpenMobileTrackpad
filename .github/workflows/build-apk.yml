@@ -5,6 +5,8 @@ on:
     branches: [main]
     tags: ['v*']
   pull_request:
+  release:
+    types: [published] # creating a GitHub Release builds and attaches the APK
   workflow_dispatch: # adds a "Run workflow" button on the Actions tab
 
 permissions:
@@ -26,7 +28,7 @@ jobs:
           cache: npm
 
       - name: Set up Java 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 17
@@ -60,8 +62,8 @@ jobs:
           name: OpenMobileTrackpad-apk
           path: dist/OpenMobileTrackpad.apk
 
-      - name: Attach APK to release (tags only)
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Attach APK to release
+        if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           files: dist/OpenMobileTrackpad.apk
